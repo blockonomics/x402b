@@ -31,7 +31,6 @@ Implementing x402 in bitcoin has various challenges, which we delve into:
 
 ==Specification==
  
-
 ===Core Payment Flow===
 We retain the core concepts and nomenclature of [https://github.com/coinbase/x402/blob/main/specs/x402-specification-v1.md x402 specification] making modifications where necessary. This helps existing x402 clients to easily add bitcoin support
 
