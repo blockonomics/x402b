@@ -30,7 +30,7 @@ Implementing x402 in bitcoin has various challenges, which we delve into:
 # Confirmation Time: Merchant has to wait for the unconfirmed bitcoin payment to confirm before returning the requested resource. Due to average 10 minute block confirmation time, synchronous return of the HTTP request is not possible. Instead an asynchronous flow must be designed.
 
 ==Specification==
- 
+
 ===Core Payment Flow===
 We retain the core concepts and nomenclature of [https://github.com/coinbase/x402/blob/main/specs/x402-specification-v1.md x402 specification] making modifications where necessary. This helps existing x402 clients to easily add bitcoin support
 
