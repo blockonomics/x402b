@@ -1,7 +1,7 @@
 <pre>
   BIP: ?
   Layer: Applications
-  Title: An Agentic Protocol Specification for Bitcoin Payments
+  Title: Internet Payment Protocol for Bitcoin Payments
   Authors: Shiva Sitamraju <shiva@blockonomics.co>
   Status: Draft
   Type: Specification
@@ -13,14 +13,20 @@
 
 ==Abstract==
 
-This BIP defines a logical hierarchy for deterministic wallets based on an algorithm
-described in BIP-0032 (BIP32 from now on) and purpose scheme described in
-BIP-0043 (BIP43 from now on).
-
-This BIP is a particular application of BIP43.
+This BIP defines a protocol for any actor to perform ecommerce over HTTP using bitcoin payments
 
 ==Motivation==
 
-The hierarchy proposed in this paper is quite comprehensive. It allows the handling of
-multiple coins, multiple accounts, external and internal chains per account and
-millions of addresses per chain.
+[https://www.coinbase.com/en-sg/developer-platform/discover/launches/x402 x402 Protocol] was announced in May 2025. It allows APIs, apps, and AI agents to transact seamlessly, unlocking a faster, automated internet economy. It has been widely adopted in the crypto / ecommerce ecosystem validating the need of crypto powered internet payment protocol. However, bitcoin support has been missing
+
+Given some historical context, support of HTTP status code 402 has been discussion in bitcoin since 2011 [https://bitcointalk.org/index.php?topic=3895.0 [1]] [https://www.reddit.com/r/Bitcoin/comments/27g1z0/402_payment_required_this_code_is_reserved_for/ [2]]. The community though hasn't formally published a protocol thus impeding its usage.
+
+==Challenges==
+Implementing x402 in bitcoin has various challenges, which we delve into: 
+
+# Address Generation: In bitcoin wallets, unique address is generated for each order. This doesn't scale in case of agentic payments as in a hour there could be thousands of order requests that cannot be rate limited with human captcha. Adddress generation without actual payments can only continue till BIP44 gap limit (default 20). High gap limit values result in slowing down funds discovery of the BIP44 wallet. Single address for all orders isn't bad for privacy and it is difficult to track which order was paid without a wallet connect mechanism
+# Single Address: x402 uses a single address 
+# Asynchronous F
+
+==References==
+[https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki BIP44-Multi-Account Hierarchy for Deterministic Wallets]
