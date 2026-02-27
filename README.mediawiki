@@ -33,13 +33,13 @@ Implementing x402 in bitcoin has various challenges, which we delve into:
  
 
 ===Core Payment Flow===
-We retain the core concepts for [x402 specification](https://github.com/coinbase/x402/blob/main/specs/x402-specification-v1.md) flow modifying it for bitcoin context
+We retain the core concepts of [https://github.com/coinbase/x402/blob/main/specs/x402-specification-v1.md x402 specification] flow modifying it for bitcoin context
 
-1. **Client Request**: Client makes a request to a resource server
-2. **Payment Required Response**: If no valid payment is attached, the server responds with a payment required signal and payment requirements
-3. **Payment Payload Request**: Client submits a bitcoin transaction signed with SIGHASH_SINGLE flag in the subsequent request. All inputs and one change output is signed. Client doesn't broadcast the trasnaction. Server is free is to add more outputs to the transaction 
-4. **Payment Received Response**: Server adds its output address to the transaction received in Step 3. Broadcasts the signed transaction to the network and returns a bitcoin transaction id
-5. **Payment Completed**: Client listen to the bitcoin network for bitcoin transaction to confirm. After transaction confirms it reinitiates Step 1, resulting in successfully fetching the server resource
+# Client Request: Client makes a request to a resource server
+# Payment Required Response: If no valid payment is attached, the server responds with a payment required signal and payment requirements
+# Payment Payload Request: Client submits hex encoded data of bitcoin transaction signed with SIGHASH_SINGLE flag in the subsequent request. All inputs and one change output is signed. Client doesn't broadcast the transaction. Server is free is to add more outputs to the transaction 
+# Payment Received Response: Server adds its output address to the transaction received. Broadcasts the signed transaction to the network and returns a bitcoin transaction id
+# Payment Completed: Client listens to the bitcoin network for bitcoin transaction to confirm. After transaction confirms it reinitiates Step 1, resulting in successfully fetching the server resource
 
 
 ===PaymentRequirementsResponse Schema===
