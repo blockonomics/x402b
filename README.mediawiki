@@ -99,5 +99,5 @@ Server broadcasts the transaction on the bitcoin network and sends transaction d
 </code>
 
 ==References==
-[https://github.com/coinbase/x402 x402 github page]
-[https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki BIP44-Multi-Account Hierarchy for Deterministic Wallets]
+* [https://github.com/coinbase/x402 x402 protocol documentation]   
+* [https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki BIP44-Multi-Account Hierarchy for Deterministic Wallets]
