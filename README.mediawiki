@@ -2,7 +2,7 @@
   BIP: ?
   Layer: Applications
   Title: An Agentic Protocol Specification for Bitcoin Payments
-  Authors: Shiva Sitamraju <shiva@blockonomics.co&gt>
+  Authors: Shiva Sitamraju <shiva@blockonomics.co>
   Status: Draft
   Type: Specification
   Assigned: ?
@@ -10,7 +10,6 @@
   Discussion:
   Version: 1.0.0  
 </pre>
-
 
 ==Abstract==
 
