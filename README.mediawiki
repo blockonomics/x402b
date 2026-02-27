@@ -38,7 +38,7 @@ We retain the core concepts and nomenclature of [https://github.com/coinbase/x40
 # Client Request: Client makes a request to a resource server
 # Payment Required Response: If no valid payment is attached, the server responds with a payment required signal and payment requirements
 # Payment Payload Request: Client submits hex encoded data of bitcoin transaction signed with SIGHASH_SINGLE flag in the subsequent request. All inputs and one change output is signed. Client doesn't broadcast the transaction. Client also adds a unique nonce to uniquely identify the request 
-# SettlementResponse: Server adds its output address to the transaction received. Broadcasts the signed transaction to the network and returns a bitcoin transaction id
+# SettlementResponse: Server adds its output address to the transaction. Broadcasts the signed transaction to the network and returns a bitcoin transaction id
 # Payment Completed: Client listens to the bitcoin network for bitcoin transaction to confirm. After transaction confirms it reinitiates Step 1 using its unique nonce in header, resulting in successfully fetching the server resource
 
 
@@ -86,7 +86,7 @@ The client includes payment details as JSON in the payment payload field:
 }
 ==SettlementResponsedResponse Schema==
 
-After payment settlement, the server includes transaction details in the payment response field as JSON:
+ Server broadcast the transaction on the bitcoin network and sends transaction details in the payment response field as JSON:
 
 ```json
 {
