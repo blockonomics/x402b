@@ -1,0 +1,27 @@
+<pre>
+  BIP: ?
+  Layer: Applications
+  Title: An Agentic Protocol Specification for Bitcoin Payments
+  Authors: Shiva Sitamraju <shiva@blockonomics.co&gt>
+  Status: Draft
+  Type: Specification
+  Assigned: ?
+  License: MIT  
+  Discussion:
+  Version: 1.0.0  
+</pre>
+
+
+==Abstract==
+
+This BIP defines a logical hierarchy for deterministic wallets based on an algorithm
+described in BIP-0032 (BIP32 from now on) and purpose scheme described in
+BIP-0043 (BIP43 from now on).
+
+This BIP is a particular application of BIP43.
+
+==Motivation==
+
+The hierarchy proposed in this paper is quite comprehensive. It allows the handling of
+multiple coins, multiple accounts, external and internal chains per account and
+millions of addresses per chain.
