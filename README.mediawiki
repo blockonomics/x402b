@@ -17,16 +17,159 @@ This BIP defines a protocol for any actor to perform ecommerce over HTTP using b
 
 ==Motivation==
 
-[https://www.coinbase.com/en-sg/developer-platform/discover/launches/x402 x402 Protocol] was announced in May 2025. It allows APIs, apps, and AI agents to transact seamlessly, unlocking a faster, automated internet economy. It has been widely adopted in the crypto / ecommerce ecosystem validating the need of crypto powered internet payment protocol. However, bitcoin support has been missing
+[https://www.coinbase.com/en-sg/developer-platform/discover/launches/x402 x402 Protocol] was announced in May 2025. It allows APIs, apps, and AI agents to transact seamlessly, unlocking a faster, automated internet economy. It has been widely adopted in the crypto / ecommerce ecosystem validating the need of crypto powered internet payment protocol. However, bitcoin support has been missing.
 
 Given some historical context, support of HTTP status code 402 has been discussion in bitcoin since 2011 [https://bitcointalk.org/index.php?topic=3895.0 [1]] [https://www.reddit.com/r/Bitcoin/comments/27g1z0/402_payment_required_this_code_is_reserved_for/ [2]]. The community though hasn't formally published a protocol thus impeding its usage.
 
 ==Challenges==
 Implementing x402 in bitcoin has various challenges, which we delve into: 
 
-# Address Generation: In bitcoin wallets, unique address is generated for each order. This doesn't scale in case of agentic payments as in a hour there could be thousands of order requests that cannot be rate limited with human captcha. Adddress generation without actual payments can only continue till BIP44 gap limit (default 20). High gap limit values result in slowing down funds discovery of the BIP44 wallet. Single address for all orders isn't bad for privacy and it is difficult to track which order was paid without a wallet connect mechanism
-# Single Address: x402 uses a single address 
-# Asynchronous F
+# Address Generation:
+## In bitcoin wallets, unique address is generated for each ecommerce order. This doesn't scale in case of agentic payments as in a hour there could be thousands of order requests that cannot be rate limited with human captcha. Adddress generation without actual payments can only continue till BIP44 gap limit (default 20). High gap limit values result in slowing down funds discovery of the BIP44 wallet. 
+## Single address for all orders is bad for privacy. It is also difficult to track which order was paid for without a wallet connect mechanism.
+# Confirmation Time: Merchant has to wait for the unconfirmed bitcoin payment to confirm before returning the requested resource. Due to average 10 minute block confirmation time, synchronous return of the HTTP request is not possible. Instead an asynchronous flow must be designed.
+
+==Specification==
+ 
+
+===Core Payment Flow===
+We retain the core concepts for [x402 specification](https://github.com/coinbase/x402/blob/main/specs/x402-specification-v1.md) flow modifying it for bitcoin context
+
+1. **Client Request**: Client makes a request to a resource server
+2. **Payment Required Response**: If no valid payment is attached, the server responds with a payment required signal and payment requirements
+3. **Payment Payload Request**: Client submits a bitcoin transaction signed with SIGHASH_SINGLE flag in the subsequent request. All inputs and one change output is signed. Client doesn't broadcast the trasnaction. Server is free is to add more outputs to the transaction 
+4. **Payment Received Response**: Server adds its output address to the transaction received in Step 3. Broadcasts the signed transaction to the network and returns a bitcoin transaction id
+5. **Payment Completed**: Client listen to the bitcoin network for bitcoin transaction to confirm. After transaction confirms it reinitiates Step 1, resulting in successfully fetching the server resource
+
+
+===PaymentRequirementsResponse Schema===
+
+When a resource server requires payment, it responds with a payment required signal and a JSON payload containing payment requirements. Example:
+
+```json
+{
+  "x402Version": 1,
+  "error": "X-PAYMENT header is required",
+  "accepts": [
+    {
+      "scheme": "exact",
+      "network": "bitcoin",
+      "maxAmountRequired": "10000",
+      "resource": "https://api.example.com/premium-data",
+      "description": "Access to premium market data",
+      "mimeType": "application/json",
+      "outputSchema": null,
+      "maxTimeoutSeconds": 60,
+      "extra": {
+        "name": "USDC",
+        "version": "2"
+      }
+    }
+  ]
+}
+```
+
+**5.1.2 Field Descriptions**
+
+The `PaymentRequirementsResponse` schema contains the following fields:
+
+**All fields are required.**
+| Field Name | Type | Description |
+| ---------- | ---- | ----------- |
+| `x402Version` | `number` | Protocol version identifier |
+| `error` | `string` | Human-readable error message explaining why payment is required |
+| `accepts` | `array` | Array of payment requirement objects defining acceptable payment methods |
+
+Each `PaymentRequirements` object in the `accepts` array contains:
+
+| Field Name          | Type     | Required | Description                                                              |
+| ------------------- | -------- | -------- | ------------------------------------------------------------------------ |
+| `scheme`            | `string` | Required | Payment scheme identifier (e.g., "exact")                                |
+| `network`           | `string` | Required | Blockchain network identifier (e.g., "base-sepolia", "ethereum-mainnet") |
+| `maxAmountRequired` | `string` | Required | Required payment amount in satoshi                                       |
+| `asset`             | `string` | Required | Token contract address                                                   |
+| `payTo`             | `string` | Required | Recipient wallet address for the payment                                 |
+| `resource`          | `string` | Required | URL of the protected resource                                            |
+| `description`       | `string` | Required | Human-readable description of the resource                               |
+| `mimeType`          | `string` | Optional | MIME type of the expected response                                       |
+| `outputSchema`      | `object` | Optional | JSON schema describing the response format                               |
+| `maxTimeoutSeconds` | `number` | Required | Maximum time allowed for payment completion                              |
+| `extra`             | `object` | Optional | Scheme-specific additional information                                   |
+
+**5.2 PaymentPayload Schema**
+
+**5.2.1 JSON Structure**
+
+The client includes payment authorization as JSON in the payment payload field:
+
+```json
+{
+  "x402Version": 1,
+  "scheme": "exact",
+  "network": "base-sepolia",
+  "payload": {
+    "signature": "0x2d6a7588d6acca505cbf0d9a4a227e0c52c6c34008c8e8986a1283259764173608a2ce6496642e377d6da8dbbf5836e9bd15092f9ecab05ded3d6293af148b571c",
+    "authorization": {
+      "from": "0x857b06519E91e3A54538791bDbb0E22373e36b66",
+      "to": "0x209693Bc6afc0C5328bA36FaF03C514EF312287C",
+      "value": "10000",
+      "validAfter": "1740672089",
+      "validBefore": "1740672154",
+      "nonce": "0xf3746613c2d920b5fdabc0856f2aeb2d4f88ee6037b8cc5d04a71a4462f13480"
+    }
+  }
+}
+```
+
+**5.2.2 Field Descriptions**
+
+The `PaymentPayload` schema contains the following fields:
+
+**All fields are required.**
+
+| Field Name    | Type     | Description                                                              |
+| ------------- | -------- | ------------------------------------------------------------------------ |
+| `x402Version` | `number` | Protocol version identifier (must be 1)                                  |
+| `scheme`      | `string` | Payment scheme identifier (e.g., "exact")                                |
+| `network`     | `string` | Blockchain network identifier (e.g., "base-sepolia", "ethereum-mainnet") |
+| `payload`     | `object` | Payment data object                                                      |
+
+The `payload` field contains a `SchemePayload` object with scheme-specific data:
+
+**All fields are required.**
+
+| Field Name      | Type     | Description                         |
+| --------------- | -------- | ----------------------------------- |
+| `signature`     | `string` | EIP-712 signature for authorization |
+| `authorization` | `object` | EIP-3009 authorization parameters   |
+
+The `Authorization` object contains the following fields:
+
+**All fields are required.**
+
+| Field Name    | Type     | Description                                     |
+| ------------- | -------- | ----------------------------------------------- |
+| `from`        | `string` | Payer's wallet address                          |
+| `to`          | `string` | Recipient's wallet address                      |
+| `value`       | `string` | Payment amount in atomic units                  |
+| `validAfter`  | `string` | Unix timestamp when authorization becomes valid |
+| `validBefore` | `string` | Unix timestamp when authorization expires       |
+| `nonce`       | `string` | 32-byte random nonce to prevent replay attacks  |
+
+**5.3 SettlementResponse Schema**
+
+**5.3.1 JSON Structure**
+
+After payment settlement, the server includes transaction details in the payment response field as JSON:
+
+```json
+{
+  "success": true,
+  "transaction": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  "network": "base-sepolia",
+  "payer": "0x857b06519E91e3A54538791bDbb0E22373e36b66"
+}
+```
 
 ==References==
 [https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki BIP44-Multi-Account Hierarchy for Deterministic Wallets]
