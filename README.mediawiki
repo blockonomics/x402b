@@ -61,8 +61,8 @@ When a resource server requires payment, it responds with a payment required sig
       "outputSchema": null,
       "maxTimeoutSeconds": 60,
       "extra": {
-        "name": "USDC",
-        "version": "2"
+        "name": "custom data",
+        "version": "1"
       }
     }
   ]
@@ -70,7 +70,7 @@ When a resource server requires payment, it responds with a payment required sig
 
 ==5.2 PaymentPayload Schema==
 
-The client includes payment authorization as JSON in the payment payload field:
+The client includes payment details as JSON in the payment payload field:
 
 ```json
 {
@@ -78,13 +78,13 @@ The client includes payment authorization as JSON in the payment payload field:
   "scheme": "exact",
   "network": "bitcoin",
   "payload": {
-    "signature": "0x2d6a7588d6acca505cbf0d9a4a227e0c52c6c34008c8e8986a1283259764173608a2ce6496642e377d6da8dbbf5836e9bd15092f9ecab05ded3d6293af148b571c",
+    "signature": "02000000000101ea3a95ec1aade7afe079a08ec0107661db016df656462b269839c08643096dde0000000000fdffffff02cb0803000000000016001480958a7af89ba717eb298c0e6752244379c636eae8030000000000001600149c4bacb5b286f194e08b5f9dcde3aa0c1be9ffc9024730440220207f25dc1d3cd8e843bd56dd6e3d16a432c8b84f57f86c83d7ced2085a8f73c802200dca28a781641df8d6ce83012e42f8f066be3b4fcdf06e6f0d5344ad501ecee0032103e5a5074c9a09eef17f4cdb0174b38a61ced2eaef87df87f9c06257e0a119a3e800000000",
     "authorization": {
-      "nonce": "0xf3746613c2d920b5fdabc0856f2aeb2d4f88ee6037b8cc5d04a71a4462f13480"
+      "nonce": "YXVIW70jezn6WtkQbzMQGu4XFj4sEsCic041Aprc874"
     }
   }
 }
-==PaymentReceivedResponse Schema==
+==SettlementResponsedResponse Schema==
 
 After payment settlement, the server includes transaction details in the payment response field as JSON:
 
