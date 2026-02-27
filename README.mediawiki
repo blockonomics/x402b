@@ -2,7 +2,7 @@
   BIP: ?
   Layer: Applications
   Title: Internet Payment Protocol for Bitcoin Payments
-  Authors: Shiva Sitamraju <shiva@blockonomics.co>
+  Authors: Shiva Sitamraju <webmaster@blockonomics.co>
   Status: Draft
   Type: Specification
   Assigned: ?
